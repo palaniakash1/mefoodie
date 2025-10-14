@@ -4,3 +4,16 @@
         <p>Developed by <span class="text-blue-400 font-semibold">DigiMaraa Technologies</span></p>
     </div>
 </footer>
+</body>
+
+</html>
+
+
+<?php
+
+
+// Properly close connection
+if (isset($db)) {
+    $db->close();
+}
+?>

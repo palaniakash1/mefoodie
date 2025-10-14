@@ -22,14 +22,14 @@ h3,
 h4,
 h5,
 h6 {
-  color: #ef4f5f !important;
+  color: var(--primary-color) !important;
 }
 
 .tomato {
-  color: #ef4f5f !important;
+  color: var(--primary-color) !important;
 }
 .tomato-bg {
-  background-color: #ef4f5f !important;
+  background-color: var(--primary-color) !important;
 }
 header,
 footer {
@@ -38,5 +38,5 @@ footer {
 
 .url-card:hover {
   text-decoration: none !important;
-  box-shadow: 0 4px 15px rgba(255, 99, 71, 0.189) !important;
+  box-shadow: 0 4px 15px --secondary-color !important;
 }

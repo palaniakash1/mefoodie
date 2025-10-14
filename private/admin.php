@@ -1,3 +1,11 @@
+<?php require_once("../private/initialize.php") ?>
+
+<?php $page_title = "Admin Page"; ?>
+<link rel="stylesheet" href="../../public/stylesheets/style.css">
+
+<!-- Header link  -->
+<?php include '../private/shared/header.php'; ?>
+
 <?php
 // Placeholder data
 $businesses = [
@@ -148,13 +156,6 @@ $businesses = [
 
 <body class="">
 
-    <?php
-    include 'config.php'; // or require_once if needed
-    ?>
-
-    <!-- Header link  -->
-    <?php include './header.php'; ?>
-
     <h1 class="text-3xl font-bold mb-8 text-center text-black mt-10 pt-2">Admin Dashboard</h1>
 
     <!-- Scrollable Table Container -->
@@ -207,8 +208,6 @@ $businesses = [
             </tbody>
         </table>
     </div>
-    <!-- footer -->
-    <?php include './footer.php'; ?>
-</body>
 
-</html>
+    <!-- Footer link  -->
+    <?php include '../private/shared/footer.php'; ?>
