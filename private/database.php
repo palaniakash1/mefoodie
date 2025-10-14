@@ -23,7 +23,7 @@ class Database
     {
         $this->connection = new mysqli($this->server, $this->username, $this->password);
         if ($this->connection->connect_error) {
-            die("❌ Server connection failed: " . $this->connection->connect_error);
+            die("Server connection failed: " . $this->connection->connect_error);
         }
     }
 
@@ -32,7 +32,7 @@ class Database
     {
         $sql = "CREATE DATABASE IF NOT EXISTS " . $this->dbname;
         if (!$this->connection->query($sql)) {
-            die("❌ Failed to create database: " . $this->connection->error);
+            die("Failed to create database: " . $this->connection->error);
         }
     }
 
@@ -58,7 +58,7 @@ class Database
             tags VARCHAR(255)
         )";
         if (!$this->connection->query($sql)) {
-            die("❌ Failed to create table: " . $this->connection->error);
+            die("Failed to create table: " . $this->connection->error);
         }
     }
 
@@ -67,7 +67,7 @@ class Database
     {
         $result = $this->connection->query($sql);
         if (!$result) {
-            die("❌ Query failed: " . $this->connection->error);
+            die("Query failed: " . $this->connection->error);
         }
         return $result;
     }
