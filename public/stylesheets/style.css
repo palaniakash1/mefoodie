@@ -40,3 +40,15 @@ footer {
   text-decoration: none !important;
   box-shadow: 0 4px 15px --secondary-color !important;
 }
+
+.full-screen-height{
+  min-height: 76vh !important;
+}
+
+.text-gray{
+  color: gray !important;
+}
+ 
+.register-popup{
+  margin-top: 80px !important;
+}
