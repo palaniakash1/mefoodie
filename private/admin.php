@@ -8,22 +8,27 @@ include '../private/shared/admin_header.php';
 ?>
 
 <div class="full-screen-height">
-    <h1 class="text-3xl font-bold mb-8 text-center text-black mt-10 pt-2">Admin Dashboard</h1>
+    <div class="text-center flex justify-center admin-title-heading-container px-5">
+        <h1 class="text-5xl font-bold mb-8 text-center text-black mt-4 py-3 admin-title-heading">MeFoodie</h1>
+    </div>
+    <div class="text-center flex justify-center admin-dashboard-heading-container">
+        <h4 class=" font-semibold mb-8 text-center text-black mt-4 py-3 rounded-lg admin-dashboard-heading">Dashboard</h4>
+    </div>
 
     <div class="overflow-x-auto px-5 mx-5 py-3">
-        <table class="min-w-full border-collapse bg-white rounded-xl shadow-md overflow-hidden whitespace-nowrap">
+        <table class="min-w-full border-collapse bg-white rounded-sm shadow-md overflow-hidden whitespace-nowrap">
             <thead>
-                <tr class="tomato-bg text-white">
-                    <th class="py-3 px-5 text-left text-sm font-semibold">ID</th>
-                    <th class="py-3 px-5 text-left text-sm font-semibold">Name</th>
-                    <th class="py-3 px-5 text-left text-sm font-semibold">Email</th>
-                    <th class="py-3 px-5 text-left text-sm font-semibold">Phone</th>
-                    <th class="py-3 px-5 text-left text-sm font-semibold">FSSAI</th>
-                    <th class="py-3 px-5 text-left text-sm font-semibold">Location</th>
-                    <th class="py-3 px-5 text-left text-sm font-semibold">Website</th>
-                    <th class="py-3 px-5 text-left text-sm font-semibold">Tags</th>
-                    <th class="py-3 px-5 text-left text-sm font-semibold">Status</th>
-                    <th class="py-3 px-5 text-left text-sm font-semibold">Actions</th>
+                <tr class="table-top text-black">
+                    <th class="py-3 px-5 text-left table-title font-semibold">ID</th>
+                    <th class="py-3 px-5 text-left table-title font-semibold">Name</th>
+                    <th class="py-3 px-5 text-left table-title font-semibold">Email</th>
+                    <th class="py-3 px-5 text-left table-title font-semibold">Phone</th>
+                    <th class="py-3 px-5 text-left table-title font-semibold">FSSAI</th>
+                    <th class="py-3 px-5 text-left table-title font-semibold">Location</th>
+                    <th class="py-3 px-5 text-left table-title font-semibold">Website</th>
+                    <th class="py-3 px-5 text-left table-title font-semibold">Tags</th>
+                    <th class="py-3 px-5 text-left table-title font-semibold">Status</th>
+                    <th class="py-3 px-5 text-left table-title font-semibold">Actions</th>
                 </tr>
             </thead>
             <tbody>

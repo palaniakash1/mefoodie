@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // 🔹 Step 6: Execute and handle result
     if ($stmt->execute()) {
-        echo "<script>alert('✅ Registration successful! Pending admin approval.'); window.location.href='../index.php';</script>";
+        echo "<script> window.location.href='../index.php';</script>";
     } else {
         echo "<script>alert('❌ Failed to register. Please try again.'); window.location.href='index.php';</script>";
     }

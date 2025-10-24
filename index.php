@@ -12,21 +12,89 @@ $restaurants = $db->fetchApprovedRestaurants(); // only approved ones
 <script src="https://cdn.tailwindcss.com"></script>
 
 <main class="min-h-screen flex flex-col items-center p-4 mt-5">
-    <h1 class="h1 font-bold text-blue-600">Welcome to MeFoodie 🍽️</h1>
+    <h1 class="h1 font-bold text-blue-600">Welcome to <span class="tomato">MeFoodie</span></h1>
 
     <div class="max-w-6xl w-full">
-        <h1 class="text-3xl font-bold text-center mb-8">Explore Nearby</h1>
+        <h1 class="home-heading-h1 text-center mb-8">Choose the <span class="tomato">Best Option </span>here</h1>
 
         <!-- Grid Layout -->
-        <div id="restaurant-list" class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 url-card">
+        <div id="restaurant-list" class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ">
+            <div class="text-center flex justify-center items-center col-span-full">
+                <h4>
+                    <a href="" class="typewrite" data-period="500" data-type='[ "Fetching Nearby Business...", "Please Wait..."]'>
+                        <span class="wrap"></span>
+                    </a>
+                </h4>
+                <script>
+                    var TxtType = function(el, toRotate, period) {
+                        this.toRotate = toRotate;
+                        this.el = el;
+                        this.loopNum = 0;
+                        this.period = parseInt(period, 10) || 2000;
+                        this.txt = '';
+                        this.tick();
+                        this.isDeleting = false;
+                    };
+
+                    TxtType.prototype.tick = function() {
+                        var i = this.loopNum % this.toRotate.length;
+                        var fullTxt = this.toRotate[i];
+
+                        if (this.isDeleting) {
+                            this.txt = fullTxt.substring(0, this.txt.length - 1);
+                        } else {
+                            this.txt = fullTxt.substring(0, this.txt.length + 1);
+                        }
+
+                        this.el.innerHTML = '<span class="wrap">' + this.txt + '</span>';
+
+                        var that = this;
+                        var delta = 200 - Math.random() * 100;
+
+                        if (this.isDeleting) {
+                            delta /= 2;
+                        }
+
+                        if (!this.isDeleting && this.txt === fullTxt) {
+                            delta = this.period;
+                            this.isDeleting = true;
+                        } else if (this.isDeleting && this.txt === '') {
+                            this.isDeleting = false;
+                            this.loopNum++;
+                            delta = 500;
+                        }
+
+                        setTimeout(function() {
+                            that.tick();
+                        }, delta);
+                    };
+
+                    window.onload = function() {
+                        var elements = document.getElementsByClassName('typewrite');
+                        for (var i = 0; i < elements.length; i++) {
+                            var toRotate = elements[i].getAttribute('data-type');
+                            var period = elements[i].getAttribute('data-period');
+                            if (toRotate) {
+                                new TxtType(elements[i], JSON.parse(toRotate), period);
+                            }
+                        }
+                        // INJECT CSS
+                        var css = document.createElement("style");
+                        css.type = "text/css";
+                        css.innerHTML = ".typewrite > .wrap { border-right: 0.08em solid #fff}";
+                        document.body.appendChild(css);
+                    };
+                </script>
+            </div>
+
             <?php if (!empty($restaurants)) : ?>
                 <?php foreach ($restaurants as $r) : ?>
                     <?php if (!empty($r['website']) && !empty($r['name'])) : ?>
-                        <a href="<?php echo htmlspecialchars($r['website']); ?>" target="_blank"
+                        <!-- <a href="<?php echo htmlspecialchars($r['website']); ?>" target="_blank"
                             class="url-card block bg-white rounded-2xl shadow-md hover:shadow-shadow-tomato transition-all p-6 text-center">
                             <h3 class="h2"><?php echo htmlspecialchars($r['name']); ?></h3>
                             <p class="text-sm text-gray-500 mt-2"><?php echo htmlspecialchars($r['website']); ?></p>
-                        </a>
+                        </a> -->
                     <?php endif; ?>
                 <?php endforeach; ?>
             <?php else : ?>
@@ -48,7 +116,7 @@ $restaurants = $db->fetchApprovedRestaurants(); // only approved ones
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(loadNearby, handleGeoError, {
                 enableHighAccuracy: true,
-                timeout: 2000
+                timeout: 7000
             });
         } else {
             handleGeoError("Geolocation not supported");
@@ -103,7 +171,7 @@ $restaurants = $db->fetchApprovedRestaurants(); // only approved ones
 
             listContainer.innerHTML = data.map(r => `
             <a href="${r.website}" target="_blank" 
-               class="block bg-white rounded-2xl shadow-md hover:shadow-shadow-tomato transition-all p-6 text-center">
+               class="url-card block bg-white rounded-2xl shadow-md hover:shadow-shadow-tomato transition-all p-6 text-center">
                 <h3 class="text-lg font-semibold text-tomato mb-1">${r.name}</h3>
                 <p class="text-gray-600 text-sm">${r.city}, ${r.state}</p>
                 <p class="text-blue-500 text-sm mt-2 truncate hover:underline">${r.website}</p>
@@ -111,6 +179,34 @@ $restaurants = $db->fetchApprovedRestaurants(); // only approved ones
             </a>
         `).join('');
         }
+    });
+
+
+    // ===============================
+    // 🔍 SEARCH WITH SUGGESTIONS
+    // ===============================
+    const searchInput = document.getElementById("searchInput");
+    const suggestions = document.getElementById("suggestions");
+
+    searchInput.addEventListener("input", function() {
+        const q = this.value.trim();
+        if (q.length === 0) {
+            suggestions.innerHTML = "";
+            return;
+        }
+
+        // Fetch dropdown suggestions
+        fetch(`private/search_restaurants.php?q=${encodeURIComponent(q)}&mode=suggest`)
+            .then(res => res.text())
+            .then(html => {
+                suggestions.innerHTML = html;
+            });
+
+        // ✅ Fetch main results at the same time
+        fetch(`private/search_restaurants.php?q=${encodeURIComponent(q)}&mode=full`)
+            .then(res => res.json())
+            .then(renderRestaurants)
+            .catch(err => console.error("Error fetching full results:", err));
     });
 </script>
 
@@ -187,12 +283,22 @@ $restaurants = $db->fetchApprovedRestaurants(); // only approved ones
 
             <!-- Submit Button -->
             <div class="text-center">
-                <button type="submit"
+                <button onclick="showPopup()" type="submit"
                     class="bg-red-500 hover:bg-red-600 text-black font-semibold px-6 py-2 rounded-md transition-colors">
                     Submit
                 </button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- Success Popup -->
+<div id="successPopup" class="popup">
+    <div class="popup-content">
+        <span class="popup-close" onclick="closePopup()">&times;</span>
+        <div class="popup-icon">✅</div>
+        <h2>Success!</h2>
+        <p>Your business registration was completed successfully.</p>
     </div>
 </div>
 
@@ -218,6 +324,17 @@ $restaurants = $db->fetchApprovedRestaurants(); // only approved ones
             popup.classList.add('hidden');
         }
     });
+
+    function showPopup() {
+        const popup = document.getElementById('successPopup');
+        popup.style.display = 'flex';
+        // Auto-close after 3 seconds
+        setTimeout(closePopup, 3000);
+    }
+
+    function closePopup() {
+        document.getElementById('successPopup').style.display = 'none';
+    }
 </script>
 
 <!-- Footer link  -->

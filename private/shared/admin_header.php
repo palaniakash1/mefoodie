@@ -14,9 +14,9 @@ if (!isset($page_title)) {
     <link rel="stylesheet" href="../public/stylesheets/style.css">
 </head>
 
-<body class="bg-gray-100 font-sans">
+<body class="">
 
-    <header class="bg-tomato text-white py-4 shadow-md">
+    <header class="bg-tomato bg-white text-white py-4 shadow-md">
         <div class="container mx-auto flex justify-between items-center px-6">
             <h1 class="text-2xl font-bold tracking-wide">🍽️ MeFoodie Admin</h1>
             <a href="../../index.php" class="bg-white tomato font-semibold px-3 py-1 rounded hover:tomato-bg hover:text-white transition">
@@ -24,5 +24,6 @@ if (!isset($page_title)) {
             </a>
         </div>
     </header>
+    <div class="admin-banner" ></div>
 
     <main class="container mx-auto px-4 py-8">

@@ -1,28 +1,35 @@
 @import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap");
-
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
 /* utilities */
 :root {
-  --primary-color: #ef4f5f;
-  --secondary-color: #f03245;
+  --primary-color: #f04f5f;
+  --secondary-color: #df3f4f;
   --background-color: #f5f5f5;
   --text-color: #333333;
-  --font-family: "Fredoka", cursive !important;
+  --text-black:#000000;
+  /* --font-family-fredoka: "Fredoka", cursive !important; */
+  --font-family-poppins: "Poppins", sans-serif !important;
+  --font-family-open-sans: "Open Sans", sans-serif !important;
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Fredoka", cursive !important;
+  font-family: var(--font-family-open-sans) !important;
 }
 
-h1,
+h1 {
+  color: var(--primary-color) !important;
+  font-family: var(--font-family-poppins) !important;
+}
 h2,
 h3,
 h4,
 h5,
 h6 {
-  color: var(--primary-color) !important;
+  color: var(--text-black) !important;
 }
 
 .tomato {
@@ -36,19 +43,159 @@ footer {
   padding: 0.5% 5% !important;
 }
 
-.url-card:hover {
-  text-decoration: none !important;
-  box-shadow: 0 4px 15px --secondary-color !important;
+.home-header {
+  box-shadow: rgba(0, 0, 0, 0.45) 0px 25px 20px -20px;
+}
+.brand-name {
+  width: 30%;
 }
 
-.full-screen-height{
+.search-register-container {
+  width: 70%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.reg-btn{
+  background-color: var(--primary-color) !important;
+  color: #ffffff !important;
+  padding: 9px 20px !important;
+  border-radius: 5px !important;
+  font-weight: 600 !important;
+}
+
+.home-heading-h1 {
+  font-size: 2.8rem !important;
+  font-weight: 700 !important;
+  color: #000000 !important;
+}
+
+.search-container
+{
+  border: 2px solid var(--secondary-color) !important;
+  border-radius: 10px !important;
+}
+.url-card {
+  border: 1px solid var(--primary-color) !important;
+  border-radius: 10px 40px !important;
+  text-decoration: none !important;
+  box-shadow: #f04f5f30 0px 4px 8px -2px, #f04f5f30 0px 0px 0px 1px;
+  transition: box-shadow 0.3s ease;
+  padding: 10px;
+  
+}
+
+.url-card:hover {
+  text-decoration: none !important;
+  box-shadow: rgba(255, 0, 0, 0.25) 0px 4px 8px -2px,
+    rgba(255, 0, 0, 0.08) 0px 0px 0px 1px;
+}
+
+.admin-title-heading-container,
+.admin-dashboard-heading-container {
+  margin-top: -1rem;
+}
+.admin-title-heading {
+  background-color: #ffffff !important;
+  width: 300px;
+  border-radius: 25px;
+}
+
+.admin-dashboard-heading-container {
+  margin-top: -2.5rem;
+}
+
+.admin-dashboard-heading {
+  background-color: #000000 !important;
+  padding: 5px 20px !important;
+  color: #facc15 !important;
+}
+
+.table-title {
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+}
+
+.full-screen-height {
   min-height: 76vh !important;
 }
 
-.text-gray{
+.text-gray {
   color: gray !important;
 }
- 
-.register-popup{
+
+.register-popup {
   margin-top: 80px !important;
+}
+
+.table-top {
+  background-color: #ffe4e6 !important;
+}
+
+.admin-banner {
+  width: 100%;
+  height: 150px;
+  background-image: url("/public/assets/mefoodie-header-bg.png");
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  z-index: -1;
+  margin-top: -3rem;
+}
+
+/* Popup background */
+.popup {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+/* Popup content box */
+.popup-content {
+  background: #ffffff;
+  padding: 20px 30px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  max-width: 350px;
+  animation: slideDown 0.4s ease;
+}
+
+/* Success icon */
+.popup-icon {
+  font-size: 3rem;
+  margin-bottom: 10px;
+}
+
+/* Close button */
+.popup-close {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  font-size: 24px;
+  color: #888;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.popup-close:hover {
+  color: #333;
+}
+
+/* Animation */
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
