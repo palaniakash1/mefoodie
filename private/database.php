@@ -88,7 +88,8 @@ class Database
     // Fetch all restaurants (admin)
     public function fetchAllRestaurants()
     {
-        $sql = "SELECT * FROM restaurants ORDER BY id DESC";
+        // $sql = "SELECT * FROM restaurants ORDER BY id DESC";
+        $sql = "SELECT * FROM restaurants WHERE status != 'deleted' ORDER BY id DESC";
         $result = $this->connection->query($sql);
         if (!$result) {
             die("Database query failed: " . $this->connection->error);

@@ -1,10 +1,15 @@
 <?php
-require_once('initialize.php');
+require_once('../private/initialize.php');
 header('Content-Type: application/json; charset=UTF-8');
 
 $q = trim($_GET['q'] ?? '');
 $mode = $_GET['mode'] ?? 'suggest'; // "suggest" for dropdown, "full" for card view
 $exact = isset($_GET['exact']) ? (int)$_GET['exact'] : 0;
+$lat = isset($_GET['lat']) ? floatval($_GET['lat']) : null;
+$lon = isset($_GET['lon']) ? floatval($_GET['lon']) : null;
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+$limit = 40;
+$offset = ($page - 1) * $limit;
 
 if (empty($q)) {
     echo json_encode([]);
@@ -14,7 +19,12 @@ if (empty($q)) {
 if ($exact) {
     // 🎯 Exact match
     $stmt = $db->connection->prepare("
-        SELECT * FROM restaurants
+        SELECT *,
+(6371 * acos(
+cos(radians(?)) * cos(radians(latitude)) *
+cos(radians(longitude) - radians(?)) +
+sin(radians(?)) * sin(radians(latitude))
+)) AS distance FROM restaurants
         WHERE status = 'approved'
         AND (
             LOWER(city) = LOWER(?) OR
@@ -23,21 +33,21 @@ if ($exact) {
             LOWER(name) = LOWER(?) OR
             LOWER(tags) LIKE LOWER(?)
         )
-        ORDER BY 
-            CASE
-                WHEN LOWER(city) = LOWER(?) THEN 1
-                WHEN LOWER(district) = LOWER(?) THEN 2
-                WHEN LOWER(state) = LOWER(?) THEN 3
-                ELSE 4
-            END
+                ORDER BY distance ASC
+                LIMIT ? OFFSET ?
     ");
     $likeTag = "%$q%";
-    $stmt->bind_param('sssssss', $q, $q, $q, $q, $likeTag, $q, $q);
+    $stmt->bind_param('dddssssii', $lat, $lon, $lat, $q, $q, $q, $q, $limit, $offset);
 } else {
     // 🔍 Partial match
     $like = "%$q%";
     $stmt = $db->connection->prepare("
-        SELECT * FROM restaurants
+        SELECT *,
+(6371 * acos(
+cos(radians(?)) * cos(radians(latitude)) *
+cos(radians(longitude) - radians(?)) +
+sin(radians(?)) * sin(radians(latitude))
+)) AS distance FROM restaurants
         WHERE status = 'approved'
         AND (
             name LIKE ? OR
@@ -46,9 +56,10 @@ if ($exact) {
             state LIKE ? OR
             district LIKE ?
         )
-        ORDER BY name ASC
-    ");
-    $stmt->bind_param('sssss', $like, $like, $like, $like, $like);
+        ORDER BY distance ASC
+        LIMIT ? OFFSET ? ");
+
+    $stmt->bind_param('dddsssssii', $lat, $lon, $lat, $like, $like, $like, $like, $like, $limit, $offset);
 }
 
 $stmt->execute();
@@ -57,11 +68,43 @@ $data = $result->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
 
+
+
+
 // =====================================
 // 🚀 MODE 1: FULL SEARCH (GRID RENDER)
 // =====================================
 if ($mode === 'full') {
-    echo json_encode($data);
+
+    // ✅ Separate total-count query for pagination
+    $countStmt = $db->connection->prepare("
+    SELECT COUNT(*) AS total
+    FROM restaurants
+    WHERE status = 'approved'
+      AND (name LIKE ? OR tags LIKE ? OR city LIKE ? OR state LIKE ? OR district LIKE ?)
+");
+    $countStmt->bind_param('sssss', $like, $like, $like, $like, $like);
+    $countStmt->execute();
+    $total = $countStmt->get_result()->fetch_assoc()['total'];
+    $countStmt->close();
+    $total_pages = ceil($total / $limit);
+
+    $restaurants = [];
+    while ($row = $result->fetch_assoc()) {
+        if (is_string($row['tags'])) {
+            $decoded = json_decode($row['tags'], true);
+            $row['tags'] = $decoded ?: $row['tags'];
+        }
+        $restaurants[] = $row;
+    }
+
+    echo json_encode([
+        "restaurants" => $data,
+        "total_pages" => $total_pages,
+        "current_page" => $page,
+        "query" => $q
+    ]);
+
     exit;
 }
 
@@ -124,11 +167,11 @@ if (count($data) > 0) {
     echo "<div class='px-3 py-1 text-xs text-gray-400 uppercase'>Suggestions</div>";
     foreach ($suggestions as $item) {
         $isTag = strpos($item, ' ') === false && strlen($item) <= 15;
-        $colorClass = $isTag ? "text-blue-600" : "text-tomato";
+        $colorClass = $isTag ? "text-black" : "text-black";
         echo "
         <a href='#'
            data-query='" . htmlspecialchars($item, ENT_QUOTES) . "'
-           class='result-item block px-4 py-2 hover:bg-gray-100 rounded-lg transition'>
+           class=' result-item block px-4 py-2 hover:bg-gray-100 rounded-lg transition'>
            <div class='font-semibold {$colorClass}'>" . htmlspecialchars($item) . "</div>
         </a>
         ";

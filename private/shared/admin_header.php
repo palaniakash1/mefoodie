@@ -1,4 +1,13 @@
 <?php
+session_start();
+
+// Optional: redirect to login if admin is not logged in
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    header("Location: ../private/admin-login.php");
+    exit;
+}
+
+// Default page title if not set
 if (!isset($page_title)) {
     $page_title = "Admin Dashboard";
 }
@@ -9,21 +18,29 @@ if (!isset($page_title)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MeFoodie | <?php echo $page_title; ?></title>
+    <title>MeFoodie | <?php echo htmlspecialchars($page_title); ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="../public/stylesheets/style.css">
+    
 </head>
 
-<body class="">
+<body>
 
-    <header class="bg-tomato bg-white text-white py-4 shadow-md">
+    <header class="bg-white text-white py-4 shadow-md">
         <div class="container mx-auto flex justify-between items-center px-6">
             <h1 class="text-2xl font-bold tracking-wide">🍽️ MeFoodie Admin</h1>
-            <a href="../../index.php" class="bg-white tomato font-semibold px-3 py-1 rounded hover:tomato-bg hover:text-white transition">
-                Go to Site
-            </a>
+
+            <div class="flex gap-2 items-center">
+                <a href="../../index.php" class="bg-white text-tomato font-semibold px-3 py-1 rounded hover:bg-tomato hover:text-white transition">
+                    Go to Site
+                </a>
+                <a href="admin-logout.php" class="bg-red-600 text-white font-semibold px-3 py-1 rounded hover:bg-red-700 transition">
+                    Sign Out
+                </a>
+            </div>
         </div>
     </header>
-    <div class="admin-banner" ></div>
+
+    <div class="admin-banner"></div>
 
     <main class="container mx-auto px-4 py-8">

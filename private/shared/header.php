@@ -1,13 +1,17 @@
-<?php include 'public\config.php' ?>
-<link rel="stylesheet" href="../../public/stylesheets/style.css">
-<header class="bg-white shadow-md flex flex-col md:flex-row items-center justify-between px-6 py-3 sticky top-0 z-50 home-header">
+<?php include __DIR__ . '/../../public/config.php'; ?>
+<link rel="stylesheet" href="<?php echo $base_url; ?>/public/stylesheets/style.css">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<header class="bg-white shadow-md flex flex-col md:flex-row items-center justify-between px-6 py-3 sticky top-0 z-50 home-header sm-w-full">
     <!-- Logo -->
     <div class="flex items-start space-x-2 mb-2 md:mb-0 brand-name">
-        <a href="index.php">
+        <a href="<?php echo $base_url; ?>/index.php">
             <h1 class="text-2xl font-bold text-red-600 tracking-tight">MeFoodie</h1>
         </a>
     </div>
-    <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto search-register-container">
+
+    <!-- Search & Register -->
+    <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto search-register-container ">
 
         <!-- Search Bar -->
         <div class="relative w-full md:w-1/2">
@@ -18,8 +22,9 @@
                     id="search-input"
                     placeholder="Search location or tags..."
                     class="bg-gray-100 flex-grow text-sm text-gray-700 focus:outline-none"
+                    autocomplete="off"
                     required>
-                <button type="submit">
+                <button type="button" id="search-btn">
                     <svg xmlns="http://www.w3.org/2000/svg"
                         class="h-5 w-5 text-gray-500 cursor-pointer"
                         viewBox="0 0 20 20"
@@ -41,14 +46,17 @@
     </div>
 
 </header>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const input = document.getElementById('search-input');
         const results = document.getElementById('search-results');
+        const searchBtn = document.getElementById('search-btn');
         const restaurantList = document.getElementById('restaurant-list');
         let timer;
 
-        // 🔍 Typing triggers dropdown suggestions
+
+        // 🔍 Live suggestions (debounced)
         input.addEventListener('input', function() {
             const query = input.value.trim();
             clearTimeout(timer);
@@ -60,7 +68,7 @@
                     return;
                 }
 
-                fetch(`<?php echo $base_url; ?>/private/search_restaurants.php?q=${encodeURIComponent(query)}&mode=suggest`)
+                fetch(`<?php echo $base_url; ?>/public/search_restaurants.php?q=${encodeURIComponent(query)}&mode=suggest`)
                     .then(res => res.text())
                     .then(data => {
                         results.innerHTML = data;
@@ -70,18 +78,56 @@
                         results.innerHTML = `<p class='text-center text-gray-500 py-2'>Error: ${err}</p>`;
                         results.classList.remove('hidden');
                     });
-            }, 300);
+            }, 250);
         });
 
-        // ⌨️ Handle Enter key press for full search
+        // 🔍 Trigger full search (Enter key or button click)
+        function triggerFullSearch(query, page = 1) {
+            if (!query) return;
+
+            // ✅ Update the URL in the address bar dynamically (no reload)
+            const newUrl = `${window.location.pathname}?q=${encodeURIComponent(query)}`;
+            window.history.pushState({
+                query
+            }, '', newUrl);
+
+            // ✅ Fetch and render results
+            fetch(`<?php echo $base_url; ?>/public/search_restaurants.php?q=${encodeURIComponent(query)}&page=${encodeURIComponent(page)}&mode=full`)
+                .then(res => res.json())
+                .then(data => {
+                    // render both restaurants and pagination using the same data object
+                    renderRestaurants(data.restaurants);
+                    renderSearchPagination(
+                        data.query,
+                        data.total_pages,
+                        data.current_page,
+                        window.userLocation.lat,
+                        window.userLocation.lon
+                    );
+                })
+                .catch(err => {
+                    restaurantList.innerHTML = `<p class='text-gray-500 text-center'>Error fetching data: ${err}</p>`;
+                });
+        }
+        window.triggerFullSearch = triggerFullSearch;
+
+
+        // 🧩 Press Enter key
         input.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 triggerFullSearch(input.value.trim());
+                results.classList.add('hidden');
             }
         });
 
-        // 🖱️ Handle click on suggestion item
+        // 🖱️ Click search icon
+        searchBtn.addEventListener('click', () => {
+            triggerFullSearch(input.value.trim());
+            results.classList.add('hidden');
+        });
+
+        // 🖱️ Click suggestion item
         results.addEventListener('click', function(e) {
             const item = e.target.closest('.result-item');
             if (!item) return;
@@ -92,32 +138,22 @@
             triggerFullSearch(query);
         });
 
-        // 🧩 Function: fetch and render full results in grid
-        function triggerFullSearch(query) {
-            if (!query) return;
-
-            fetch(`<?php echo $base_url; ?>/private/search_restaurants.php?q=${encodeURIComponent(query)}&mode=full`)
-                .then(res => res.json())
-                .then(data => renderRestaurants(data))
-                .catch(err => {
-                    restaurantList.innerHTML = `<p class='text-gray-500 text-center'>Error fetching data: ${err}</p>`;
-                });
-        }
-
-        // 🧩 Reuse same renderer as index.php
+        // 🧩 Render results in grid
         function renderRestaurants(data) {
+            if (!restaurantList) return;
+
             if (!data || data.length === 0) {
                 restaurantList.innerHTML = `<p class='text-gray-500 text-center'>No matching restaurants found.</p>`;
                 return;
             }
 
             restaurantList.innerHTML = data.map(r => `
-            <div class="bg-white rounded-xl shadow-lg p-4 hover:shadow-xl transition">
-                <h3 class="font-bold text-lg text-tomato mb-2">${r.name}</h3>
-                <p><strong></strong> ${r.state}</p>
-                <p><a href="${r.website}" target="_blank" class="text-blue-500 hover:underline">${r.website}</a></p>
-            </div>
-        `).join('');
+            <div class="url-card p-5 bg-white text-center shadow-lg hover:shadow-xl transition">
+                <h3 class="font-semibold text-lg text-tomato mb-2">${r.name}</h3>
+                <p>${r.city || r.district || ''}</p>
+                <a href="${r.website}" target="_blank" class="text-blue-500 hover:underline truncate">${r.website}</a>
+                </div>
+                `).join('');
         }
 
         // 🧭 Hide dropdown when clicking outside
@@ -126,5 +162,33 @@
                 results.classList.add('hidden');
             }
         });
+
+
+
+
+        function renderSearchPagination(query, totalPages, currentPage, lat, lon) {
+            const container = document.getElementById("pagination");
+            container.innerHTML = "";
+
+            if (totalPages <= 1) return;
+
+            // Prev
+            container.innerHTML += currentPage > 1 ?
+                `<button class="px-3 py-1 border rounded hover:bg-gray-100" onclick="triggerFullSearch('${query}',${currentPage-1})">Prev</button>` :
+                `<span class="px-3 py-1 text-gray-400">Prev</span>`;
+
+            // Numbers
+            for (let i = 1; i <= totalPages; i++) {
+                container.innerHTML += i === currentPage ?
+                    `<span class="px-3 py-1 border rounded tomato-bg text-white">${i}</span>` :
+                    `<button class="px-3 py-1 border rounded hover:bg-gray-100" onclick="triggerFullSearch('${query}',${i})">${i}</button>`;
+            }
+
+            // Next
+            container.innerHTML += currentPage < totalPages ?
+                `<button class="px-3 py-1 border rounded hover:bg-gray-100" onclick="triggerFullSearch('${query}',${currentPage+1})">Next</button>` :
+                `<span class="px-3 py-1 text-gray-400">Next</span>`;
+        }
+
     });
 </script>

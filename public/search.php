@@ -1,43 +1,72 @@
-<?php
-require_once('../private/initialize.php');
+<?php include '../private/shared/header.php'; ?>
+<div class="max-w-lg mx-auto relative mt-10">
+    <input
+        type="text"
+        id="searchBox"
+        placeholder="Search restaurants, city, or tags..."
+        class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring focus:border-blue-300"
+        autocomplete="off" />
+    <div id="suggestionsBox"
+        class="absolute left-0 right-0 bg-white border rounded-lg shadow-lg mt-1 hidden z-50 max-h-64 overflow-y-auto">
+    </div>
+</div>
 
-$search = trim($_GET['q'] ?? '');
+<script>
+    const searchBox = document.getElementById('searchBox');
+    const suggestionsBox = document.getElementById('suggestionsBox');
+    let debounceTimer;
 
-if ($search === '') {
-    echo "<p class='text-gray-500 text-center mt-5'>Please enter a search term.</p>";
-    exit;
-}
+    // Detect if URL already has ?q=
+    const urlParams = new URLSearchParams(window.location.search);
+    const existingQuery = urlParams.get('q');
+    if (existingQuery) {
+        searchBox.value = existingQuery;
+        // Optionally trigger a full search here later
+    }
 
-$stmt = $db->connection->prepare("
-    SELECT * FROM restaurants 
-    WHERE status = 'approved'
-    AND (
-        city LIKE ? 
-        OR state LIKE ? 
-        OR district LIKE ?
-        OR JSON_CONTAINS(tags, JSON_QUOTE(?)) -- if stored as JSON
-        OR tags LIKE ?                       -- fallback if stored as plain text
-    )
-");
+    // Handle typing
+    searchBox.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        const query = searchBox.value.trim();
+        if (!query) {
+            suggestionsBox.classList.add('hidden');
+            suggestionsBox.innerHTML = '';
+            return;
+        }
+        debounceTimer = setTimeout(() => fetchSuggestions(query), 200);
+    });
 
-$like = "%$search%";
-$stmt->bind_param("sssss", $like, $like, $like, $search, $like);
-$stmt->execute();
-$result = $stmt->get_result();
+    // Fetch suggestions (AJAX)
+    function fetchSuggestions(query) {
+        fetch(`search_restaurants.php?q=${encodeURIComponent(query)}&mode=suggest`)
+            .then(res => res.text())
+            .then(html => {
+                suggestionsBox.innerHTML = html;
+                suggestionsBox.classList.remove('hidden');
+            })
+            .catch(() => {
+                suggestionsBox.classList.add('hidden');
+            });
+    }
 
-if ($result->num_rows === 0) {
-    echo "<p class='text-gray-500 text-center mt-5'>No matching results found for '<strong>$search</strong>'.</p>";
-    exit;
-}
+    // Handle clicking a suggestion
+    suggestionsBox.addEventListener('click', (e) => {
+        const item = e.target.closest('.result-item');
+        if (!item) return;
 
-while ($r = $result->fetch_assoc()) {
-    echo "
-    <div class='bg-white rounded-xl shadow-lg p-4 hover:shadow-xl transition mb-4'>
-        <h3 class='font-bold text-lg text-tomato mb-2'>{$r['name']}</h3>
-        <p><strong>Location:</strong> {$r['district']}, {$r['state']}</p>
-        <p><strong>Website:</strong> <a href='{$r['website']}' target='_blank' class='text-blue-500 hover:underline'>{$r['website']}</a></p>
-        <p><strong>Tags:</strong> {$r['tags']}</p>
-    </div>";
-}
+        const selected = item.getAttribute('data-query');
+        if (!selected) return;
 
-$stmt->close();
+        // Redirect to new URL
+        window.location.href = `search.php?q=${encodeURIComponent(selected)}`;
+    });
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('#searchBox') && !e.target.closest('#suggestionsBox')) {
+            suggestionsBox.classList.add('hidden');
+        }
+    });
+</script>
+
+<?php include '../private/shared/footer.php'; ?>

@@ -16,8 +16,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tags = trim($_POST['tags'] ?? '');
 
     // 🔹 Step 2: Basic validation
-    if ($name === '' || $email === '' || $ph === '' || $website === '') {
+    if ($name === '' || $email === '' || $ph === '' || $website === '' || $tags === '' || $city === '' || $state === '' || $district === '') {
         die("❌ Required fields missing.");
+    }
+
+
+    // If the URL does not start with http:// or https://, add https://
+    if (!preg_match('/^https?:\/\//i', $website)) {
+        $website = 'https://' . $website;
     }
 
     // 🔹 Step 3: Normalize tags (comma-separated)

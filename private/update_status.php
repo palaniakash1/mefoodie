@@ -6,13 +6,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $status = $_POST['status'] ?? null;
 
     if ($id && $status) {
-        $sql = "UPDATE restaurants SET status = '" . $db->connection->real_escape_string($status) . "' WHERE id = " . intval($id);
-        if ($db->query($sql)) {
-            echo "Status updated successfully to $status.";
+        // Clean inputs
+        $id = intval($id);
+        $status = $db->connection->real_escape_string($status);
+
+        if ($status === 'delete') {
+            // Delete the record instead of updating
+            $sql = "DELETE FROM restaurants WHERE id = $id";
+            $action = "deleted";
         } else {
-            echo "Error updating status.";
+            // Normal status update
+            $sql = "UPDATE restaurants SET status = '$status' WHERE id = $id";
+            $action = "updated to $status";
+        }
+
+        if ($db->query($sql)) {
+            echo "Restaurant record successfully $action.";
+        } else {
+            echo "Database error: " . $db->connection->error;
         }
     } else {
-        echo "Invalid request.";
+        echo "Invalid request: missing ID or status.";
     }
 }

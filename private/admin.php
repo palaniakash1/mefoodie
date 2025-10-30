@@ -46,7 +46,7 @@ include '../private/shared/admin_header.php';
                             <td class="py-3 px-5"><?php echo htmlspecialchars($row['fssai']); ?></td>
                             <td class="py-3 px-5"><?php echo htmlspecialchars($row['city'] . ', ' . $row['district'] . ', ' . $row['state'] . ' - ' . $row['pincode']); ?></td>
                             <td class="py-3 px-5">
-                                <a href="<?php echo htmlspecialchars($row['website']); ?>" class="text-blue-600 hover:underline" target="_blank">
+                                <a href="<?php echo htmlspecialchars($row['website']); ?>" class="text-blue-600 hover:underline truncate" target="_blank">
                                     <?php echo htmlspecialchars($row['website']); ?>
                                 </a>
                             </td>
