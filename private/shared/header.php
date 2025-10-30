@@ -11,7 +11,7 @@
     </div>
 
     <!-- Search & Register -->
-    <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto search-register-container ">
+    <div class="flex flex-col py-2 md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto search-register-container ">
 
         <!-- Search Bar -->
         <div class="relative w-full md:w-1/2">
@@ -52,7 +52,7 @@
         const input = document.getElementById('search-input');
         const results = document.getElementById('search-results');
         const searchBtn = document.getElementById('search-btn');
-        const restaurantList = document.getElementById('restaurant-list');
+        const businessList = document.getElementById('business-list');
         let timer;
 
 
@@ -68,7 +68,7 @@
                     return;
                 }
 
-                fetch(`<?php echo $base_url; ?>/public/search_restaurants.php?q=${encodeURIComponent(query)}&mode=suggest`)
+                fetch(`<?php echo $base_url; ?>/public/search_businesses.php?q=${encodeURIComponent(query)}&mode=suggest`)
                     .then(res => res.text())
                     .then(data => {
                         results.innerHTML = data;
@@ -92,11 +92,11 @@
             }, '', newUrl);
 
             // ✅ Fetch and render results
-            fetch(`<?php echo $base_url; ?>/public/search_restaurants.php?q=${encodeURIComponent(query)}&page=${encodeURIComponent(page)}&mode=full`)
+            fetch(`<?php echo $base_url; ?>/public/search_businesses.php?q=${encodeURIComponent(query)}&page=${encodeURIComponent(page)}&mode=full`)
                 .then(res => res.json())
                 .then(data => {
-                    // render both restaurants and pagination using the same data object
-                    renderRestaurants(data.restaurants);
+                    // render both businesses and pagination using the same data object
+                    renderbusinesses(data.businesses);
                     renderSearchPagination(
                         data.query,
                         data.total_pages,
@@ -106,7 +106,7 @@
                     );
                 })
                 .catch(err => {
-                    restaurantList.innerHTML = `<p class='text-gray-500 text-center'>Error fetching data: ${err}</p>`;
+                    businessList.innerHTML = `<p class='text-gray-500 text-center'>Error fetching data: ${err}</p>`;
                 });
         }
         window.triggerFullSearch = triggerFullSearch;
@@ -139,15 +139,15 @@
         });
 
         // 🧩 Render results in grid
-        function renderRestaurants(data) {
-            if (!restaurantList) return;
+        function renderbusinesses(data) {
+            if (!businessList) return;
 
             if (!data || data.length === 0) {
-                restaurantList.innerHTML = `<p class='text-gray-500 text-center'>No matching restaurants found.</p>`;
+                businessList.innerHTML = `<p class='text-gray-500 text-center'>No matching businesses found.</p>`;
                 return;
             }
 
-            restaurantList.innerHTML = data.map(r => `
+            businessList.innerHTML = data.map(r => `
             <div class="url-card p-5 bg-white text-center shadow-lg hover:shadow-xl transition">
                 <h3 class="font-semibold text-lg text-tomato mb-2">${r.name}</h3>
                 <p>${r.city || r.district || ''}</p>

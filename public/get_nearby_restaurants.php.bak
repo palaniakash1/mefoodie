@@ -17,14 +17,14 @@ try {
                     cos(radians(longitude) - radians(?)) +
                     sin(radians(?)) * sin(radians(latitude))
                 )) AS distance
-            FROM restaurants
+            FROM businesses
             WHERE status = 'approved'
             ORDER BY distance ASC
         ");
         $stmt->bind_param("ddd", $lat, $lon, $lat);
     } else {
         $stmt = $db->connection->prepare("
-            SELECT * FROM restaurants
+            SELECT * FROM businesses
             WHERE status = 'approved'
             ORDER BY name ASC
         ");
@@ -32,17 +32,17 @@ try {
 
     $stmt->execute();
     $result = $stmt->get_result();
-    $restaurants = [];
+    $businesses = [];
 
     while ($row = $result->fetch_assoc()) {
         if (is_string($row['tags'])) {
             $decoded = json_decode($row['tags'], true);
             $row['tags'] = $decoded ?: $row['tags'];
         }
-        $restaurants[] = $row;
+        $businesses[] = $row;
     }
 
-    echo json_encode($restaurants);
+    echo json_encode($businesses);
 } catch (Exception $e) {
     echo json_encode(["error" => $e->getMessage()]);
 }

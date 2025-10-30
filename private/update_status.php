@@ -12,16 +12,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($status === 'delete') {
             // Delete the record instead of updating
-            $sql = "DELETE FROM restaurants WHERE id = $id";
+            $sql = "DELETE FROM businesses WHERE id = $id";
             $action = "deleted";
         } else {
             // Normal status update
-            $sql = "UPDATE restaurants SET status = '$status' WHERE id = $id";
+            $sql = "UPDATE businesses SET status = '$status' WHERE id = $id";
             $action = "updated to $status";
         }
 
         if ($db->query($sql)) {
-            echo "Restaurant record successfully $action.";
+            echo "business record successfully $action.";
         } else {
             echo "Database error: " . $db->connection->error;
         }

@@ -24,7 +24,7 @@ cos(radians(?)) * cos(radians(latitude)) *
 cos(radians(longitude) - radians(?)) +
 sin(radians(?)) * sin(radians(latitude))
 )) AS distance
-FROM restaurants
+FROM businesses
 WHERE status = 'approved'
     ORDER BY distance ASC
     LIMIT ? OFFSET ? ");
@@ -32,20 +32,20 @@ $stmt->bind_param("dddii", $lat, $lon, $lat, $limit, $offset);
 $stmt->execute();
 $result = $stmt->get_result();
 
-$restaurants = [];
+$businesses = [];
 while ($row = $result->fetch_assoc()) {
     if (is_string($row['tags'])) {
         $decoded = json_decode($row['tags'], true);
         $row['tags'] = $decoded ?: $row['tags'];
     }
-    $restaurants[] = $row;
+    $businesses[] = $row;
 }
 
-$total = $db->connection->query("SELECT COUNT(*) AS cnt FROM restaurants WHERE status='approved'")->fetch_assoc()['cnt'];
+$total = $db->connection->query("SELECT COUNT(*) AS cnt FROM businesses WHERE status='approved'")->fetch_assoc()['cnt'];
 $total_pages = ceil($total / $limit);
 
 echo json_encode([
-    "restaurants" => $restaurants,
+    "businesses" => $businesses,
     "total_pages" => $total_pages,
     "current_page" => $page
 ]);

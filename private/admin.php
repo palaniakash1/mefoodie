@@ -2,7 +2,7 @@
 require_once("../private/initialize.php");
 
 $page_title = "Admin Page";
-$restaurants = $db->fetchAllRestaurants();
+$businesses = $db->fetchAllbusinesses();
 
 include '../private/shared/admin_header.php';
 ?>
@@ -32,12 +32,12 @@ include '../private/shared/admin_header.php';
                 </tr>
             </thead>
             <tbody>
-                <?php if (empty($restaurants)): ?>
+                <?php if (empty($businesses)): ?>
                     <tr>
                         <td colspan="10" class="text-center py-5 text-gray-500">No records found.</td>
                     </tr>
                 <?php else: ?>
-                    <?php foreach ($restaurants as $row): ?>
+                    <?php foreach ($businesses as $row): ?>
                         <tr class="border-b hover:bg-gray-50 transition">
                             <td class="py-3 px-5"><?php echo htmlspecialchars($row['id']); ?></td>
                             <td class="py-3 px-5 font-medium text-gray-900"><?php echo htmlspecialchars($row['name']); ?></td>

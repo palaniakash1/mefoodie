@@ -33,18 +33,20 @@ $page_title = "MeFoodie - Home Page";
     <?php include 'private/shared/header.php'; ?>
 
     <main class="min-h-screen flex flex-col items-center p-4 mt-5">
-        <h1 class="text-black mb-2 text-2xl font-bold text-center">
+        <h1 class="text-black text-[16px] md:text-[20px] sm:text-[18px] font-bold text-center mb-2 ">
             Welcome to <span class="text-tomato">MeFoodie</span>
         </h1>
 
         <div class="max-w-6xl w-full">
-            <h1 class="text-center text-2xl mb-8 text-black home-heading-h1 sm:leading-snug">
+            <h1 class="text-center text-[24px] sm:text-[32px] md:text-[40px] 
+           leading-[1.2] sm:leading-[1.4] md:leading-[1.6] 
+           text-black mb-8 home-heading-h1">
                 The Smart Way to Grow <span class="text-tomato">Your Business</span> Presence.
             </h1>
 
-            <!-- Restaurant Grid -->
-            <div id="restaurant-list" class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-5 md:px-3 sm-w-full">
-                <p class="text-gray-500 text-center col-span-full">Loading restaurants...</p>
+            <!-- business Grid -->
+            <div id="business-list" class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
+                <p class="text-gray-500 text-center col-span-full">Loading businesses...</p>
             </div>
 
             <!-- Pagination -->
@@ -66,23 +68,23 @@ $page_title = "MeFoodie - Home Page";
                         lon: pos.coords.longitude
                     };
                     console.log("📍 User Location:", lat, lon);
-                    loadRestaurants(lat, lon, 1);
+                    loadbusinesses(lat, lon, 1);
                 }, err => {
                     console.warn("⚠️ Geolocation failed:", err.message);
                     // fallback - Madurai
-                    loadRestaurants(9.9195, 78.1193, 1);
+                    loadbusinesses(9.9195, 78.1193, 1);
                 });
             } else {
                 console.warn("⚠️ Geolocation not supported. Using fallback.");
-                loadRestaurants(9.9195, 78.1193, 1);
+                loadbusinesses(9.9195, 78.1193, 1);
             }
         });
 
         // -------------------------
         // 🧭 Fetch & Render Logic
         // -------------------------
-        function loadRestaurants(lat, lon, page) {
-            const endpoint = `${window.location.origin}/public/get_nearby_restaurants.php?lat=${lat}&lon=${lon}&page=${page}`;
+        function loadbusinesses(lat, lon, page) {
+            const endpoint = `${window.location.origin}/public/get_nearby_businesses.php?lat=${lat}&lon=${lon}&page=${page}`;
             console.log("🔗 Fetching:", endpoint);
 
             fetch(endpoint)
@@ -92,37 +94,37 @@ $page_title = "MeFoodie - Home Page";
                 })
                 .then(data => {
                     if (data.error) {
-                        document.getElementById("restaurant-list").innerHTML =
+                        document.getElementById("business-list").innerHTML =
                             `<p class="text-center text-gray-500">${data.error}</p>`;
                         return;
                     }
 
-                    renderRestaurants(data.restaurants);
+                    renderbusinesses(data.businesses);
                     renderPagination(data.total_pages, data.current_page, lat, lon);
                 })
                 .catch(err => {
                     console.error("❌ Fetch failed:", err);
-                    document.getElementById("restaurant-list").innerHTML =
+                    document.getElementById("business-list").innerHTML =
                         `<p class="text-center text-gray-500">Error loading data.</p>`;
                 });
         }
 
-        function renderRestaurants(restaurants) {
-            const container = document.getElementById("restaurant-list");
+        function renderbusinesses(businesses) {
+            const container = document.getElementById("business-list");
             container.innerHTML = "";
 
-            if (!restaurants || restaurants.length === 0) {
-                container.innerHTML = `<p class="text-center text-gray-500 col-span-full">No restaurants found nearby.</p>`;
+            if (!businesses || businesses.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-500 col-span-full">No businesses found nearby.</p>`;
                 return;
             }
 
-            restaurants.forEach(r => {
+            businesses.forEach(r => {
                 container.innerHTML += `
                     <a href="${r.website}" target="_blank"
-                       class="url-card block bg-white rounded-2xl shadow-md hover:shadow-lg transition-all p-6 text-center sm-w-full">
-                        <h3 class="text-lg font-semibold text-tomato mb-1">${r.name}</h3>
-                        <p class="text-gray-600 text-sm">${r.city}</p>
-                        <p class="text-blue-500 text-sm mt-2 truncate hover:underline">${r.website}</p>
+                       class="url-card block bg-white rounded-2xl shadow-md hover:shadow-lg transition-all p-6 text-center sm:w-full">
+                        <h3 class="text-lg font-semibold text-tomato mb-1 truncate">${r.name}</h3>
+                        <p class="text-gray-600 text-sm truncate">${r.city}</p>
+                        <p class="text-blue-500 text-sm mt-2 truncate hover:underline truncate">${r.website}</p>
                     </a>`;
             });
         }
@@ -135,19 +137,19 @@ $page_title = "MeFoodie - Home Page";
 
             // Prev
             container.innerHTML += currentPage > 1 ?
-                `<button class="px-3 py-1 border rounded hover:bg-gray-100" onclick="loadRestaurants(${lat},${lon},${currentPage-1})">Prev</button>` :
+                `<button class="px-3 py-1 border rounded hover:bg-gray-100" onclick="loadbusinesses(${lat},${lon},${currentPage-1})">Prev</button>` :
                 `<span class="px-3 py-1 text-gray-400">Prev</span>`;
 
             // Numbers
             for (let i = 1; i <= totalPages; i++) {
                 container.innerHTML += i === currentPage ?
                     `<span class="px-3 py-1 border rounded tomato-bg text-white">${i}</span>` :
-                    `<button class="px-3 py-1 border rounded hover:bg-gray-100" onclick="loadRestaurants(${lat},${lon},${i})">${i}</button>`;
+                    `<button class="px-3 py-1 border rounded hover:bg-gray-100" onclick="loadbusinesses(${lat},${lon},${i})">${i}</button>`;
             }
 
             // Next
             container.innerHTML += currentPage < totalPages ?
-                `<button class="px-3 py-1 border rounded hover:bg-gray-100" onclick="loadRestaurants(${lat},${lon},${currentPage+1})">Next</button>` :
+                `<button class="px-3 py-1 border rounded hover:bg-gray-100" onclick="loadbusinesses(${lat},${lon},${currentPage+1})">Next</button>` :
                 `<span class="px-3 py-1 text-gray-400">Next</span>`;
         }
     </script>
@@ -167,15 +169,15 @@ $page_title = "MeFoodie - Home Page";
 
                 <!-- Name -->
                 <div>
-                    <label class="block text-black font-medium mb-1" for="name">Restaurant Name</label>
-                    <input type="text" id="name" required name="name" placeholder="Enter your Restaurant name"
+                    <label class="block text-black font-medium mb-1" for="name">Business Name <span class="text-tomato">*</span></label>
+                    <input type="text" id="name" required name="name" placeholder="Enter your business name"
                         class="w-full border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none" />
-                    <small id="error-name" class="text-red-500 text-sm hidden">Restaurant name is required.</small>
+                    <small id="error-name" class="text-red-500 text-sm hidden">business name is required.</small>
                 </div>
 
                 <!-- Email -->
                 <div>
-                    <label class="block text-black font-medium mb-1" for="email">Email</label>
+                    <label class="block text-black font-medium mb-1" for="email">Email <span class="text-tomato">*</span></label>
                     <input type="email" id="email" name="email" required placeholder="Enter your email"
                         class="w-full border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none" />
                     <small id="error-email" class="text-red-500 text-sm hidden">email is required.</small>
@@ -183,7 +185,7 @@ $page_title = "MeFoodie - Home Page";
 
                 <!-- Phone -->
                 <div>
-                    <label class="block text-black font-medium mb-1" for="ph">Phone</label>
+                    <label class="block text-black font-medium mb-1" for="ph">Phone <span class="text-tomato">*</span></label>
                     <input type="tel" id="ph" name="ph" pattern="\d{10}"
                         maxlength="10"
                         minlength="10" required placeholder="Enter your phone number"
@@ -209,22 +211,24 @@ $page_title = "MeFoodie - Home Page";
                             class="border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none" />
                         <input type="text" name="district" placeholder="District" required
                             class="border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none" />
-                        <input type="text" name="pincode" placeholder="Pincode"
+                        <input type="text" name="pincode" placeholder="Pincode" pattern="\d{6}"
+                            maxlength="6"
+                            minlength="6"
                             class="border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none" />
                     </div>
                 </div>
 
                 <!-- Website URL -->
                 <div>
-                    <label class="block text-black font-medium mb-1" for=" website">Website URL <span class="text-gray" style="color:gray">(eg: www.example.com)</span></label>
+                    <label class="block text-black font-medium mb-1" for=" website">Website URL <span class="text-tomato">*</span> <span class="text-gray" style="color:gray">(eg: www.example.com)</span></label>
                     <input type="text" id="website" name="website" placeholder="Enter website URL" required
                         class="w-full border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none" />
                 </div>
 
                 <!-- Tags -->
                 <div>
-                    <label class="block text-black font-medium mb-1" for="tags">Tags</label>
-                    <input type="text" id="tags" name="tags" placeholder="helpful to user to search by tag" required
+                    <label class="block text-black font-medium mb-1" for="tags">Tags <span class="text-tomato">*</span> <span class="text-gray" style="color:gray"> Use comma [,] to separate</span></label>
+                    <input type="text" id="tags" name="tags" placeholder="Helpful for user to search by tag" required
                         class="w-full border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none" />
                 </div>
 
@@ -247,7 +251,7 @@ $page_title = "MeFoodie - Home Page";
             <span class="popup-close" id="closePopupBtn" onclick="closePopup()">&times;</span>
             <div class="popup-icon">✅</div>
             <h2>Success!</h2>
-            <p>Your business registration was completed successfully. <br>We will review your restaurant and register it within 24 hours.</p>
+            <p>Your business registration was completed successfully. <br>We will review your business and register it within 24 hours.</p>
         </div>
     </div>
 

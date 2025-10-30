@@ -45,7 +45,7 @@ class Database
     // Step 4: Create main table with new columns
     private function createTable()
     {
-        $sql = "CREATE TABLE IF NOT EXISTS restaurants (
+        $sql = "CREATE TABLE IF NOT EXISTS businesses (
             id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(255),
             email VARCHAR(255),
@@ -85,48 +85,48 @@ class Database
         }
     }
 
-    // Fetch all restaurants (admin)
-    public function fetchAllRestaurants()
+    // Fetch all businesses (admin)
+    public function fetchAllbusinesses()
     {
-        // $sql = "SELECT * FROM restaurants ORDER BY id DESC";
-        $sql = "SELECT * FROM restaurants WHERE status != 'deleted' ORDER BY id DESC";
+        // $sql = "SELECT * FROM businesses ORDER BY id DESC";
+        $sql = "SELECT * FROM businesses WHERE status != 'deleted' ORDER BY id DESC";
         $result = $this->connection->query($sql);
         if (!$result) {
             die("Database query failed: " . $this->connection->error);
         }
 
-        $restaurants = [];
+        $businesses = [];
         while ($row = $result->fetch_assoc()) {
             $row['tags'] = json_decode($row['tags'], true) ?? [];
-            $restaurants[] = $row;
+            $businesses[] = $row;
         }
-        return $restaurants;
+        return $businesses;
     }
 
-    // Fetch only approved restaurants
-    public function fetchApprovedRestaurants()
+    // Fetch only approved businesses
+    public function fetchApprovedbusinesses()
     {
-        $sql = "SELECT * FROM restaurants WHERE status = 'approved' ORDER BY id DESC";
+        $sql = "SELECT * FROM businesses WHERE status = 'approved' ORDER BY id DESC";
         $result = $this->connection->query($sql);
         if (!$result) {
             die("Database query failed: " . $this->connection->error);
         }
 
-        $restaurants = [];
+        $businesses = [];
         while ($row = $result->fetch_assoc()) {
             $row['tags'] = json_decode($row['tags'], true) ?? [];
-            $restaurants[] = $row;
+            $businesses[] = $row;
         }
 
-        return $restaurants;
+        return $businesses;
     }
 
 
-    // Insert new restaurant (called during registration)
-    public function insertRestaurant($data)
+    // Insert new business (called during registration)
+    public function insertbusiness($data)
     {
         $stmt = $this->connection->prepare(
-            "INSERT INTO restaurants (name, email, ph, fssai, state, city, district, pincode, website, tags, status, latitude, longitude)
+            "INSERT INTO businesses (name, email, ph, fssai, state, city, district, pincode, website, tags, status, latitude, longitude)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)"
         );
 

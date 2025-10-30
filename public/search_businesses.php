@@ -24,7 +24,7 @@ if ($exact) {
 cos(radians(?)) * cos(radians(latitude)) *
 cos(radians(longitude) - radians(?)) +
 sin(radians(?)) * sin(radians(latitude))
-)) AS distance FROM restaurants
+)) AS distance FROM businesses
         WHERE status = 'approved'
         AND (
             LOWER(city) = LOWER(?) OR
@@ -47,7 +47,7 @@ sin(radians(?)) * sin(radians(latitude))
 cos(radians(?)) * cos(radians(latitude)) *
 cos(radians(longitude) - radians(?)) +
 sin(radians(?)) * sin(radians(latitude))
-)) AS distance FROM restaurants
+)) AS distance FROM businesses
         WHERE status = 'approved'
         AND (
             name LIKE ? OR
@@ -79,7 +79,7 @@ if ($mode === 'full') {
     // ✅ Separate total-count query for pagination
     $countStmt = $db->connection->prepare("
     SELECT COUNT(*) AS total
-    FROM restaurants
+    FROM businesses
     WHERE status = 'approved'
       AND (name LIKE ? OR tags LIKE ? OR city LIKE ? OR state LIKE ? OR district LIKE ?)
 ");
@@ -89,17 +89,17 @@ if ($mode === 'full') {
     $countStmt->close();
     $total_pages = ceil($total / $limit);
 
-    $restaurants = [];
+    $businesses = [];
     while ($row = $result->fetch_assoc()) {
         if (is_string($row['tags'])) {
             $decoded = json_decode($row['tags'], true);
             $row['tags'] = $decoded ?: $row['tags'];
         }
-        $restaurants[] = $row;
+        $businesses[] = $row;
     }
 
     echo json_encode([
-        "restaurants" => $data,
+        "businesses" => $data,
         "total_pages" => $total_pages,
         "current_page" => $page,
         "query" => $q

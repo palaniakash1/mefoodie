@@ -16,7 +16,7 @@ require_once("private/initialize.php");
 
 $page_title = "MeFoodie - Home Page";
 
-$restaurants = $db->fetchApprovedRestaurants(); // only approved ones
+$businesses = $db->fetchApprovedbusinesses(); // only approved ones
 
 
 ?>
@@ -44,7 +44,7 @@ $restaurants = $db->fetchApprovedRestaurants(); // only approved ones
         <h1 class="home-heading-h1 text-center mb-8">Grow Your <span class="tomato">Business </span>here</h1>
 
         <!-- Grid Layout -->
-        <div id="restaurant-list" class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ">
+        <div id="business-list" class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ">
             <div class="text-center flex justify-center items-center col-span-full">
                 <h4>
                     <a href="" class="typewrite" data-period="500" data-type='[ "Fetching Nearby Business...", "Please Wait..."]'>
@@ -116,8 +116,8 @@ $restaurants = $db->fetchApprovedRestaurants(); // only approved ones
 
             
 
-            <?php if (!empty($restaurants)) : ?>
-                <?php foreach ($restaurants as $r) : ?>
+            <?php if (!empty($businesses)) : ?>
+                <?php foreach ($businesses as $r) : ?>
                     <?php if (!empty($r['website']) && !empty($r['name'])) : ?>
                         <!-- <a href="<?php echo htmlspecialchars($r['website']); ?>" target="_blank"
                             class="url-card block bg-white rounded-2xl shadow-md hover:shadow-shadow-tomato transition-all p-6 text-center">
@@ -139,7 +139,7 @@ $restaurants = $db->fetchApprovedRestaurants(); // only approved ones
     // 🧭 GEOLOCATION + SMART LOADING
     // ===============================
     document.addEventListener("DOMContentLoaded", () => {
-        const listContainer = document.getElementById("restaurant-list");
+        const listContainer = document.getElementById("business-list");
 
         // 1️⃣ Try to get user's geolocation
         if (navigator.geolocation) {
@@ -152,7 +152,7 @@ $restaurants = $db->fetchApprovedRestaurants(); // only approved ones
         }
 
         // ===============================
-        // ✅ Load restaurants near user
+        // ✅ Load businesses near user
         // ===============================
         function loadNearby(position) {
             const lat = position.coords.latitude;
@@ -160,16 +160,16 @@ $restaurants = $db->fetchApprovedRestaurants(); // only approved ones
 
             console.log("📍 User Location:", lat, lon);
 
-            // Fetch nearby restaurants (sorted by distance)
-            fetch(`public/get_nearby_restaurants.php?lat=${lat}&lon=${lon}`)
+            // Fetch nearby businesses (sorted by distance)
+            fetch(`public/get_nearby_businesses.php?lat=${lat}&lon=${lon}`)
                 .then(res => {
                     if (!res.ok) throw new Error("Network error");
                     return res.json();
                 })
-                .then(data => renderRestaurants(data))
+                .then(data => renderbusinesses(data))
                 .catch(err => {
                     console.error("❌ Fetch failed:", err);
-                    listContainer.innerHTML = `<p class='text-gray-500 text-center'>Error fetching nearby restaurants.</p>`;
+                    listContainer.innerHTML = `<p class='text-gray-500 text-center'>Error fetching nearby businesses.</p>`;
                 });
         }
 
@@ -179,22 +179,22 @@ $restaurants = $db->fetchApprovedRestaurants(); // only approved ones
         function handleGeoError(error) {
             console.warn("⚠️ Geolocation unavailable:", error.message || error);
 
-            // Fallback: Load default restaurants (no location)
-            fetch("public/get_nearby_restaurants.php")
+            // Fallback: Load default businesses (no location)
+            fetch("public/get_nearby_businesses.php")
                 .then(res => res.json())
-                .then(data => renderRestaurants(data))
+                .then(data => renderbusinesses(data))
                 .catch(err => {
                     console.error("❌ Fetch failed:", err);
-                    listContainer.innerHTML = `<p class='text-gray-500 text-center'>Unable to load restaurants.</p>`;
+                    listContainer.innerHTML = `<p class='text-gray-500 text-center'>Unable to load businesses.</p>`;
                 });
         }
 
         // ===============================
-        // 🎨 Render restaurant cards
+        // 🎨 Render business cards
         // ===============================
-        function renderRestaurants(data) {
+        function renderbusinesses(data) {
             if (!data || data.length === 0) {
-                listContainer.innerHTML = `<p class='text-gray-500 text-center mt-6'>No restaurants found nearby.</p>`;
+                listContainer.innerHTML = `<p class='text-gray-500 text-center mt-6'>No businesses found nearby.</p>`;
                 return;
             }
 
@@ -234,13 +234,13 @@ $restaurants = $db->fetchApprovedRestaurants(); // only approved ones
                 return;
             }
 
-            fetch(`public/search_restaurants.php?q=${encodeURIComponent(q)}&mode=suggest`)
+            fetch(`public/search_businesses.php?q=${encodeURIComponent(q)}&mode=suggest`)
                 .then(res => res.text())
                 .then(html => suggestions.innerHTML = html);
 
-            fetch(`public/search_restaurants.php?q=${encodeURIComponent(q)}&mode=full`)
+            fetch(`public/search_businesses.php?q=${encodeURIComponent(q)}&mode=full`)
                 .then(res => res.json())
-                .then(renderRestaurants)
+                .then(renderbusinesses)
                 .catch(err => console.error("Error fetching full results:", err));
         });
     });
@@ -262,8 +262,8 @@ $restaurants = $db->fetchApprovedRestaurants(); // only approved ones
 
             <!-- Name -->
             <div>
-                <label class="block text-black font-medium mb-1" for="name">Restaurant Name</label>
-                <input type="text" id="name" name="name" placeholder="Enter your Restaurant name"
+                <label class="block text-black font-medium mb-1" for="name">business Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter your business name"
                     class="w-full border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none" />
             </div>
 

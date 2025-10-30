@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // 🔹 Step 5: Insert query using prepared statements
     $stmt = $db->connection->prepare("
-        INSERT INTO restaurants 
+        INSERT INTO businesses 
         (name, email, ph, fssai, state, city, district, pincode, website, tags, latitude, longitude, status)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
     ");

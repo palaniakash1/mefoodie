@@ -24,10 +24,10 @@ mefoodie
    │  └─ Mefoodie-header-bg.png
    ├─ config.php
    ├─ favicon.ico.png
-   ├─ get_nearby_restaurants.php
+   ├─ get_nearby_businesses.php
    ├─ register.php
    ├─ search.php
-   ├─ search_restaurants.php
+   ├─ search_businesses.php
    └─ stylesheets
       └─ style.css
 

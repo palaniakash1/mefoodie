@@ -3,7 +3,7 @@
     <input
         type="text"
         id="searchBox"
-        placeholder="Search restaurants, city, or tags..."
+        placeholder="Search businesses, city, or tags..."
         class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring focus:border-blue-300"
         autocomplete="off" />
     <div id="suggestionsBox"
@@ -38,7 +38,7 @@
 
     // Fetch suggestions (AJAX)
     function fetchSuggestions(query) {
-        fetch(`search_restaurants.php?q=${encodeURIComponent(query)}&mode=suggest`)
+        fetch(`search_businesses.php?q=${encodeURIComponent(query)}&mode=suggest`)
             .then(res => res.text())
             .then(html => {
                 suggestionsBox.innerHTML = html;
