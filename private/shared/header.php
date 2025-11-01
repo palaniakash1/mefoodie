@@ -148,11 +148,14 @@
             }
 
             businessList.innerHTML = data.map(r => `
-            <div class="url-card p-5 bg-white text-center shadow-lg hover:shadow-xl transition">
+            
+            <a href="${r.website}" target="_blank"
+                       class="url-card block bg-white rounded-2xl shadow-md hover:shadow-lg transition-all p-6 text-center sm:w-full">
                 <h3 class="font-semibold text-lg text-tomato mb-2">${r.name}</h3>
                 <p>${r.city || r.district || ''}</p>
-                <a href="${r.website}" target="_blank" class="text-blue-500 hover:underline truncate">${r.website}</a>
-                </div>
+                <p class="text-blue-500 text-sm mt-2 truncate hover:underline truncate">${r.website}</p>
+                </a>
+
                 `).join('');
         }
 

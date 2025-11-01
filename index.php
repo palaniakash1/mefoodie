@@ -16,6 +16,7 @@ if (basename($request_uri) === "index.php") {
 require_once("private/initialize.php");
 $page_title = "MeFoodie - Home Page";
 ?>
+<?php include __DIR__ . '/public/config.php'; ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -26,7 +27,7 @@ $page_title = "MeFoodie - Home Page";
     <title><?php echo "$page_title" ?> | One platform All Business</title>
     <link rel="icon" href="public/favicon.ico.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="public/stylesheets/style.css">
+    <link rel="stylesheet" href="<?php echo $base_url; ?>/public/stylesheets/style.css">
 </head>
 
 <body class="bg-gray-50 text-gray-900">
@@ -155,16 +156,16 @@ $page_title = "MeFoodie - Home Page";
     </script>
 
     <!-- Popup Overlay -->
-    <div id="popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-500">
+    <div id="popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-[9999]">
         <!-- Popup Content -->
-        <div class=" bg-white register-popup rounded-xl shadow-lg w-full max-w-md p-6 relative">
+        <div class=" bg-white register-popup rounded-xl shadow-lg w-full max-w-md p-6 relative mt-8 sm:mt-8 md:mt-5">
             <!-- Close Button -->
             <button id="closePopupBtn" class="absolute top-3 right-3 text-black font-bold text-xl">&times;</button>
 
             <h2 class="text-2xl font-bold text-black mb-4 text-center">Register Your Business</h2>
 
             <!-- Form -->
-            <form action="public/register.php" method="POST" class="w-full max-w-2xl bg-white  rounded-xl p-8 space-y-6 overflow-y-auto max-h-[80vh]">
+            <form action="public/register.php" method="POST" class="w-full max-w-2xl bg-white  rounded-xl p-8 space-y-6 overflow-y-auto max-h-[80vh] mt-5">
                 <!-- <h2 class="text-2xl font-bold text-black text-center mb-4">Register Your Business</h2> -->
 
                 <!-- Name -->
@@ -205,8 +206,47 @@ $page_title = "MeFoodie - Home Page";
                 <div>
                     <label class="block text-black font-medium mb-2">Location</label>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" name="state" placeholder="State" value="Tamil Nadu"
-                            class="border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none" />
+                        <!-- State Dropdown -->
+                        <select name="state"
+                            class="border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none">
+                            <option value="">Select State</option>
+                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                            <option value="Assam">Assam</option>
+                            <option value="Bihar">Bihar</option>
+                            <option value="Chhattisgarh">Chhattisgarh</option>
+                            <option value="Goa">Goa</option>
+                            <option value="Gujarat">Gujarat</option>
+                            <option value="Haryana">Haryana</option>
+                            <option value="Himachal Pradesh">Himachal Pradesh</option>
+                            <option value="Jharkhand">Jharkhand</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Kerala">Kerala</option>
+                            <option value="Madhya Pradesh">Madhya Pradesh</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Manipur">Manipur</option>
+                            <option value="Meghalaya">Meghalaya</option>
+                            <option value="Mizoram">Mizoram</option>
+                            <option value="Nagaland">Nagaland</option>
+                            <option value="Odisha">Odisha</option>
+                            <option value="Punjab">Punjab</option>
+                            <option value="Rajasthan">Rajasthan</option>
+                            <option value="Sikkim">Sikkim</option>
+                            <option value="Tamil Nadu" selected>Tamil Nadu</option>
+                            <option value="Telangana">Telangana</option>
+                            <option value="Tripura">Tripura</option>
+                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                            <option value="Uttarakhand">Uttarakhand</option>
+                            <option value="West Bengal">West Bengal</option>
+                            <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                            <option value="Chandigarh">Chandigarh</option>
+                            <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                            <option value="Ladakh">Ladakh</option>
+                            <option value="Lakshadweep">Lakshadweep</option>
+                            <option value="Puducherry">Puducherry</option>
+                        </select>
                         <input type="text" name="city" placeholder="City" required
                             class="border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none" />
                         <input type="text" name="district" placeholder="District" required
