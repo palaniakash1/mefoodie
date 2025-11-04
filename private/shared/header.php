@@ -92,7 +92,11 @@
             }, '', newUrl);
 
             // ✅ Fetch and render results
-            fetch(`<?php echo $base_url; ?>/public/search_businesses.php?q=${encodeURIComponent(query)}&page=${encodeURIComponent(page)}&mode=full`)
+            const lat = window.userLocation?.lat || 0;
+            const lon = window.userLocation?.lon || 0;
+
+            fetch(`<?php echo $base_url; ?>/public/search_businesses.php?q=${encodeURIComponent(query)}&page=${encodeURIComponent(page)}&mode=full&lat=${lat}&lon=${lon}`)
+
                 .then(res => res.json())
                 .then(data => {
                     // render both businesses and pagination using the same data object
@@ -101,8 +105,10 @@
                         data.query,
                         data.total_pages,
                         data.current_page,
-                        window.userLocation.lat,
-                        window.userLocation.lon
+                        // window.userLocation.lat,
+                        // window.userLocation.lon
+                        data.lat,
+                        data.lon
                     );
                 })
                 .catch(err => {

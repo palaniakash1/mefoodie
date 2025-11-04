@@ -21,9 +21,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
 
-    // If the URL does not start with http:// or https://, add https://
+    // Add https:// if missing
     if (!preg_match('/^https?:\/\//i', $website)) {
         $website = 'https://' . $website;
+    }
+
+    // Validate domain format
+    if (!preg_match('/^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+\.(com|in|co\.in|org|net|io|ai|biz)(\/[^\s]*)?$/i', $website)) {
+        die('❌ Invalid website URL.');
     }
 
     // 🔹 Step 3: Normalize tags (comma-separated)

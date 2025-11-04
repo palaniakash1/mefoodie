@@ -156,7 +156,7 @@ $page_title = "MeFoodie - Home Page";
     </script>
 
     <!-- Popup Overlay -->
-    <div id="popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-[9999]">
+    <div id="popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-[999]">
         <!-- Popup Content -->
         <div class=" bg-white register-popup rounded-xl shadow-lg w-full max-w-md p-6 relative mt-8 sm:mt-8 md:mt-5">
             <!-- Close Button -->
@@ -171,7 +171,8 @@ $page_title = "MeFoodie - Home Page";
                 <!-- Name -->
                 <div>
                     <label class="block text-black font-medium mb-1" for="name">Business Name <span class="text-tomato">*</span></label>
-                    <input type="text" id="name" required name="name" placeholder="Enter your business name"
+                    <input type="text" id="name" required name="name" placeholder="Enter your business name" pattern="^[A-Za-z][A-Za-z\s]{2,49}$"
+                        title="Business name should contain only letters and spaces (minimum 3 characters, no numbers or symbols)."
                         class="w-full border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none" />
                     <small id="error-name" class="text-red-500 text-sm hidden">business name is required.</small>
                 </div>
@@ -179,7 +180,7 @@ $page_title = "MeFoodie - Home Page";
                 <!-- Email -->
                 <div>
                     <label class="block text-black font-medium mb-1" for="email">Email <span class="text-tomato">*</span></label>
-                    <input type="email" id="email" name="email" required placeholder="Enter your email"
+                    <input type="email" id="email" name="email" required placeholder="Enter your email" title="Enter a valid email address (e.g., name@example.com)"
                         class="w-full border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none" />
                     <small id="error-email" class="text-red-500 text-sm hidden">email is required.</small>
                 </div>
@@ -187,7 +188,8 @@ $page_title = "MeFoodie - Home Page";
                 <!-- Phone -->
                 <div>
                     <label class="block text-black font-medium mb-1" for="ph">Phone <span class="text-tomato">*</span></label>
-                    <input type="tel" id="ph" name="ph" pattern="\d{10}"
+                    <input type="tel" id="ph" name="ph" pattern="^(?!.*(\d)\1{9})(?!0123456789)(?!1234567890)(?!9876543210)[6-9]\d{9}$"
+                        title="Enter a valid 10-digit Indian mobile number (not sequential or repeating)"
                         maxlength="10"
                         minlength="10" required placeholder="Enter your phone number"
                         class="w-full border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none" />
@@ -196,7 +198,7 @@ $page_title = "MeFoodie - Home Page";
                 <!-- FSSAI -->
                 <div>
                     <label class="block text-black font-medium mb-1" for="fssai">FSSAI</label>
-                    <input type="text" id="fssai" name="fssai" placeholder="Enter your FSSAI number" pattern="\d{14}"
+                    <input type="text" id="fssai" name="fssai" placeholder="Enter your FSSAI number(optional)" pattern="^\d{14}$" title="FSSAI number must contain exactly 14 digits"
                         maxlength="14"
                         minlength="14"
                         class="w-full border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none" />
@@ -247,9 +249,11 @@ $page_title = "MeFoodie - Home Page";
                             <option value="Lakshadweep">Lakshadweep</option>
                             <option value="Puducherry">Puducherry</option>
                         </select>
-                        <input type="text" name="city" placeholder="City" required
+                        <input type="text" name="city" placeholder="City" required pattern="^[A-Za-z\s]{2,50}$"
+                            title="Enter a valid city name (letters only)"
                             class="border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none" />
-                        <input type="text" name="district" placeholder="District" required
+                        <input type="text" name="district" placeholder="District" required pattern="^[A-Za-z\s]{2,50}$"
+                            title="Enter a valid city name (letters only)"
                             class="border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none" />
                         <input type="text" name="pincode" placeholder="Pincode" pattern="\d{6}"
                             maxlength="6"
@@ -268,7 +272,8 @@ $page_title = "MeFoodie - Home Page";
                 <!-- Tags -->
                 <div>
                     <label class="block text-black font-medium mb-1" for="tags">Tags <span class="text-tomato">*</span> <span class="text-gray" style="color:gray"> Use comma [,] to separate</span></label>
-                    <input type="text" id="tags" name="tags" placeholder="Helpful for user to search by tag" required
+                    <input type="text" id="tags" name="tags" placeholder="Helpful for user to search by tag" required pattern="^([a-zA-Z]+(?:\s[a-zA-Z]+)*)(,\s*[a-zA-Z]+(?:\s[a-zA-Z]+)*){0,2}$" "
+                        title=" Enter up to 3 tags separated by commas (letters only). Example: software, website, app"
                         class="w-full border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none" />
                 </div>
 
@@ -286,7 +291,7 @@ $page_title = "MeFoodie - Home Page";
 
 
     <!-- Success Popup -->
-    <div id="successPopup" class="popup">
+    <div id="successPopup" class="popup z-[9999]">
         <div class="popup-content">
             <span class="popup-close" id="closePopupBtn" onclick="closePopup()">&times;</span>
             <div class="popup-icon">✅</div>
@@ -319,52 +324,80 @@ $page_title = "MeFoodie - Home Page";
         });
     </script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.querySelector('form'); // select your form
-            const popup = document.getElementById('successPopup');
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.querySelector("form");
+            const website = document.getElementById("website");
+            const successPopup = document.getElementById("successPopup");
 
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault(); // stop normal submission to check validity
+            // ✅ Updated Regex (accepts google.com, www.google.com, https://google.com, etc.)
+            const websiteRegex = /^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})(\/[^\s]*)?$/i;
 
-                // ✅ Step 1: Check if all required fields are valid
-                if (!form.checkValidity()) {
-                    form.reportValidity(); // show browser validation messages
-                    return; // stop here — no popup
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                // 🧹 Always clear validity first
+                website.setCustomValidity("");
+
+                let urlValue = website.value.trim();
+
+                // ✅ Auto-add https:// if missing
+                if (urlValue && !/^https?:\/\//.test(urlValue)) {
+                    urlValue = "https://" + urlValue;
                 }
 
-                // ✅ Step 2: Submit form (AJAX or actual backend)
+                // ✅ Update the actual field before validation
+                website.value = urlValue;
+
+                console.log("🔍 Validating:", urlValue);
+
+                // ✅ Validate using regex
+                if (!websiteRegex.test(urlValue)) {
+                    website.setCustomValidity(
+                        "Please enter a valid website URL like example.com or https://example.in"
+                    );
+                    website.reportValidity();
+                    return;
+                }
+
+                // ✅ Recheck browser validations
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                // ✅ If all fine → submit via AJAX
                 try {
-                    // Example AJAX submission (you can adjust this part)
                     const formData = new FormData(form);
                     const response = await fetch(form.action, {
-                        method: 'POST',
+                        method: "POST",
                         body: formData
                     });
 
                     if (response.ok) {
-                        // ✅ Step 3: Show success popup only if backend returns success
                         showPopup();
-                        form.reset(); // optional: clear form after success
+                        form.reset();
                     } else {
-                        alert('Submission failed. Please try again.');
+                        alert("❌ Submission failed. Please try again.");
                     }
                 } catch (error) {
-                    console.error('Error:', error);
-                    alert('An error occurred. Please try again.');
+                    console.error("Error:", error);
+                    alert("⚠️ Something went wrong. Please try again.");
                 }
             });
+
+            function showPopup() {
+                successPopup.style.display = "flex";
+                setTimeout(() => (successPopup.style.display = "none"), 3000);
+            }
+
+            // 🩹 Optional: Clear error immediately when typing again
+            website.addEventListener("input", () => {
+                website.setCustomValidity("");
+            });
         });
-
-        function showPopup() {
-            const popup = document.getElementById('successPopup');
-            popup.style.display = 'flex';
-            setTimeout(closePopup, 3000);
-        }
-
-        function closePopup() {
-            document.getElementById('successPopup').style.display = 'none';
-        }
     </script>
+
+
 </body>
 
 </html>

@@ -15,51 +15,39 @@ if (empty($q)) {
     echo json_encode([]);
     exit;
 }
+// ==========================================
+// 🚀 Handle location-aware vs normal search
+// ==========================================
+$hasLocation = isset($lat, $lon) && $lat !== null && $lon !== null && $lat != 0 && $lon != 0;
+$like = "%$q%";
 
-if ($exact) {
-    // 🎯 Exact match
+if ($hasLocation) {
+    // ✅ Location is available — order by nearest
     $stmt = $db->connection->prepare("
         SELECT *,
-(6371 * acos(
-cos(radians(?)) * cos(radians(latitude)) *
-cos(radians(longitude) - radians(?)) +
-sin(radians(?)) * sin(radians(latitude))
-)) AS distance FROM businesses
+        (6371 * acos(
+            cos(radians(?)) * cos(radians(latitude)) *
+            cos(radians(longitude) - radians(?)) +
+            sin(radians(?)) * sin(radians(latitude))
+        )) AS distance
+        FROM businesses
         WHERE status = 'approved'
-        AND (
-            LOWER(city) = LOWER(?) OR
-            LOWER(district) = LOWER(?) OR
-            LOWER(state) = LOWER(?) OR
-            LOWER(name) = LOWER(?) OR
-            LOWER(tags) LIKE LOWER(?)
-        )
-                ORDER BY distance ASC
-                LIMIT ? OFFSET ?
-    ");
-    $likeTag = "%$q%";
-    $stmt->bind_param('dddssssii', $lat, $lon, $lat, $q, $q, $q, $q, $limit, $offset);
-} else {
-    // 🔍 Partial match
-    $like = "%$q%";
-    $stmt = $db->connection->prepare("
-        SELECT *,
-(6371 * acos(
-cos(radians(?)) * cos(radians(latitude)) *
-cos(radians(longitude) - radians(?)) +
-sin(radians(?)) * sin(radians(latitude))
-)) AS distance FROM businesses
-        WHERE status = 'approved'
-        AND (
-            name LIKE ? OR
-            tags LIKE ? OR
-            city LIKE ? OR
-            state LIKE ? OR
-            district LIKE ?
-        )
+          AND (name LIKE ? OR tags LIKE ? OR city LIKE ? OR state LIKE ? OR district LIKE ?)
         ORDER BY distance ASC
-        LIMIT ? OFFSET ? ");
-
+        LIMIT ? OFFSET ?
+    ");
     $stmt->bind_param('dddsssssii', $lat, $lon, $lat, $like, $like, $like, $like, $like, $limit, $offset);
+} else {
+    // ⚙️ No location — fallback to alphabetical or relevance
+    $stmt = $db->connection->prepare("
+        SELECT *
+        FROM businesses
+        WHERE status = 'approved'
+          AND (name LIKE ? OR tags LIKE ? OR city LIKE ? OR state LIKE ? OR district LIKE ?)
+        ORDER BY name ASC
+        LIMIT ? OFFSET ?
+    ");
+    $stmt->bind_param('sssssii', $like, $like, $like, $like, $like, $limit, $offset);
 }
 
 $stmt->execute();
