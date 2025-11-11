@@ -60,7 +60,6 @@ header {
 }
 
 .brand-name {
-  flex: 1;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -214,6 +213,29 @@ button[disabled] {
   opacity: 0.7;
 }
 
+.search-container input::placeholder {
+  color: #999;
+}
+
+.search-container:focus-within {
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+  border-color: #dadce0;
+}
+
+.search-container-parent {
+    width: 100% !important;
+    display: flex !important;
+    align-content: center !important;
+    justify-content: center !important;
+    margin-top: -2rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  #search-results {
+    width: 49.5% !important;
+    margin-top: 2.45rem;
+}
+
 /* Animation */
 @keyframes slideDown {
   from {
@@ -239,6 +261,16 @@ button[disabled] {
     z-index: 999;
     margin: 0 auto !important;
   }
+  
+  #search-results {
+    width: 100% !important;
+    margin-top: 2.45rem;
+}
+.search-container-parent {
+
+  margin-bottom: 2rem !important;
+}
+
 }
 
 /* ============================ */
@@ -255,6 +287,16 @@ button[disabled] {
 
     margin: 0 auto !important;
   }
+  
+.search-container-parent {
+
+  margin-bottom: 2rem !important;
+}
+  #search-results {
+    width: 70% !important;
+    margin-top: 2.45rem;
+}
+
 }
 
 /* ============================================================== */
@@ -278,11 +320,7 @@ button[disabled] {
     width: 80%;
     margin: 0px 0;
   }
-  .search-container-parent {
-    display: flex;
-    align-content: center;
-    justify-content: center;
-  }
+  
 
   .reg-btn {
     width: auto;
