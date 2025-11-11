@@ -42,11 +42,13 @@ $page_title = "MeFoodie - Home Page";
             <h1 class="text-center text-[24px] sm:text-[32px] md:text-[40px] 
            leading-[1.2] sm:leading-[1.4] md:leading-[1.6] 
            text-black mb-8 home-heading-h1">
-                The Smart Way to Grow <span class="text-tomato">Your Business</span> Presence.
+                From Kitchen To Clicks <span class="text-tomato">Grow </span> Your Business Online!.
             </h1>
 
             <!-- business Grid -->
-            <div id="business-list" class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
+
+            <div id="business-list" class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 max-w-7xl mx-auto">
+
                 <p class="text-gray-500 text-center col-span-full">Loading businesses...</p>
             </div>
 
@@ -249,10 +251,10 @@ $page_title = "MeFoodie - Home Page";
                             <option value="Lakshadweep">Lakshadweep</option>
                             <option value="Puducherry">Puducherry</option>
                         </select>
-                        <input type="text" name="city" placeholder="City" required pattern="^[A-Za-z\s]{2,50}$"
+                        <input type="text" name="district" placeholder="District*" required pattern="^[A-Za-z\s]{2,50}$"
                             title="Enter a valid city name (letters only)"
                             class="border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none" />
-                        <input type="text" name="district" placeholder="District" required pattern="^[A-Za-z\s]{2,50}$"
+                        <input type="text" name="city" placeholder="Area/Town*" required pattern="^[A-Za-z\s]{2,50}$"
                             title="Enter a valid city name (letters only)"
                             class="border-2 border-tomato-500 focus:border-tomato-600 rounded-md px-4 py-2 text-black focus:outline-none" />
                         <input type="text" name="pincode" placeholder="Pincode" pattern="\d{6}"
@@ -291,12 +293,17 @@ $page_title = "MeFoodie - Home Page";
 
 
     <!-- Success Popup -->
-    <div id="successPopup" class="popup z-[9999]">
-        <div class="popup-content">
-            <span class="popup-close" id="closePopupBtn" onclick="closePopup()">&times;</span>
-            <div class="popup-icon">✅</div>
-            <h2>Success!</h2>
-            <p>Your business registration was completed successfully. <br>We will review your business and register it within 24 hours.</p>
+    <div id="successPopup" class=" fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-[9999]">
+        <div class="popup-content bg-white rounded-xl shadow-lg p-6 max-w-md w-11/12 text-center relative">
+            <div class="popup-icon text-4xl mb-4">✅</div>
+            <h2 class="text-xl font-semibold mb-2">Success!</h2>
+            <p class="text-gray-600 mb-6">
+                Your business registration was completed successfully. <br>
+                We will review your business and register it within 24 hours.
+            </p>
+            <button id="okBtn" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition">
+                OK
+            </button>
         </div>
     </div>
 
@@ -328,12 +335,25 @@ $page_title = "MeFoodie - Home Page";
             const form = document.querySelector("form");
             const website = document.getElementById("website");
             const successPopup = document.getElementById("successPopup");
+            const okBtn = document.getElementById("okBtn");
 
             // ✅ Updated Regex (accepts google.com, www.google.com, https://google.com, etc.)
             const websiteRegex = /^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})(\/[^\s]*)?$/i;
 
             form.addEventListener("submit", async (e) => {
                 e.preventDefault();
+
+
+                // Elements
+                const submitBtn = form.querySelector("button[type='submit']");
+                const originalBtnText = submitBtn.innerHTML;
+
+                // 🛑 Disable the button immediately
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = "Submitting... ⏳";
+                submitBtn.classList.add("opacity-70", "cursor-not-allowed");
+
+
 
                 // 🧹 Always clear validity first
                 website.setCustomValidity("");
@@ -368,6 +388,10 @@ $page_title = "MeFoodie - Home Page";
                 // ✅ If all fine → submit via AJAX
                 try {
                     const formData = new FormData(form);
+
+                    // Optional: show a spinner overlay or text while waiting
+                    console.log("⏳ Submitting form...");
+
                     const response = await fetch(form.action, {
                         method: "POST",
                         body: formData
@@ -382,13 +406,35 @@ $page_title = "MeFoodie - Home Page";
                 } catch (error) {
                     console.error("Error:", error);
                     alert("⚠️ Something went wrong. Please try again.");
+                } finally {
+                    resetButton();
                 }
+
+                // 🧩 Helper function to reset button
+                function resetButton() {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.classList.remove("opacity-70", "cursor-not-allowed");
+                }
+
             });
 
+            // Show popup
             function showPopup() {
                 successPopup.style.display = "flex";
-                setTimeout(() => (successPopup.style.display = "none"), 3000);
             }
+
+            // Hide popup when OK is clicked
+            okBtn.addEventListener("click", () => {
+                successPopup.style.display = "none";
+            });
+
+            // Close popup when clicking outside popup-content
+            successPopup.addEventListener("click", (e) => {
+                if (e.target === successPopup) {
+                    successPopup.style.display = "none";
+                }
+            });
 
             // 🩹 Optional: Clear error immediately when typing again
             website.addEventListener("input", () => {

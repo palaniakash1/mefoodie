@@ -4,37 +4,6 @@ require_once("../private/initialize.php");
 $page_title = "Admin Page";
 $businesses = $db->fetchAllbusinesses();
 
-// Pagination settings
-// Pagination settings
-if (isset($_GET['limit'])) {
-    $per_page = ($_GET['limit'] === 'all') ? 'all' : intval($_GET['limit']);
-} else {
-    $per_page = 20; // default
-}
-$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
-$offset = ($page - 1) * ($per_page !== 'all' ? $per_page : 0);
-
-
-// Count total (excluding deleted)
-$total_stmt = $db->connection->query("SELECT COUNT(*) as total FROM businesses WHERE status != 'deleted'");
-$total_businesses = $total_stmt->fetch_assoc()['total'];
-
-// Fetch paginated data (excluding deleted)
-if ($per_page === 'all') {
-    $stmt = $db->connection->query("SELECT * FROM businesses WHERE status != 'deleted' ORDER BY id DESC");
-} else {
-    $stmt = $db->connection->prepare("SELECT * FROM businesses WHERE status != 'deleted' ORDER BY id DESC LIMIT ? OFFSET ?");
-    $stmt->bind_param("ii", $per_page, $offset);
-    $stmt->execute();
-    $stmt = $stmt->get_result();
-}
-
-
-$businesses = ($per_page === 'all') ? $stmt->fetch_all(MYSQLI_ASSOC) : $stmt->fetch_all(MYSQLI_ASSOC);
-
-// Total pages
-$total_pages = ($per_page === 'all') ? 1 : ceil($total_businesses / $per_page);
-
 include '../private/shared/admin_header.php';
 ?>
 
@@ -45,88 +14,6 @@ include '../private/shared/admin_header.php';
     <div class="text-center flex justify-center admin-dashboard-heading-container">
         <h4 class=" font-semibold mb-8 text-center text-black mt-4 py-3 rounded-lg admin-dashboard-heading">Dashboard</h4>
     </div>
-    <!-- Table Footer Controls -->
-    <div class="flex justify-between items-center px-5 py-4 border-t bg-white mt-2">
-
-        <!-- Left side: Data per page dropdown -->
-        <div class="flex items-center space-x-2">
-            <label for="limit" class="text-sm text-gray-600 font-medium">Show Data:</label>
-            <select id="limit" name="limit" class="border border-gray-300 text-gray-700 rounded-md px-2 py-1 text-sm focus:ring focus:ring-blue-200"
-                onchange="changeLimit(this.value)">
-                <option value="20" <?= ($per_page == 20 || !isset($_GET['limit'])) ? 'selected' : '' ?>>20</option>
-                <option value="50" <?= ($per_page == 50) ? 'selected' : '' ?>>50</option>
-                <option value="200" <?= ($per_page == 200) ? 'selected' : '' ?>>200</option>
-                <option value="all" <?= ($per_page === 'all') ? 'selected' : '' ?>>All</option>
-            </select>
-            <span class="ml-2 text-gray-500 text-sm">(<?= number_format($total_businesses) ?> total)</span>
-
-        </div>
-
-        <!-- Right side: Pagination -->
-        <div id="pagination" class="flex items-center space-x-2">
-            <?php if ($total_pages > 1 && $per_page !== 'all'): ?>
-                <div class="flex items-center space-x-1">
-                    <!-- Prev -->
-                    <?php if ($page > 1): ?>
-                        <a href="?page=<?= $page - 1 ?>&limit=<?= $per_page ?>" class="px-3 py-1 border rounded hover:bg-gray-100">&lt;</a>
-                    <?php endif; ?>
-
-                    <!-- Always show first page -->
-                    <a href="?page=1&limit=<?= $per_page ?>"
-                        class="px-3 py-1 border rounded <?= ($page == 1) ? 'bg-red-500 text-white' : 'bg-red-100' ?>">01</a>
-
-                    <!-- Left dots -->
-                    <?php if ($page > 3): ?>
-                        <span class="px-2">...</span>
-                    <?php endif; ?>
-
-                    <!-- Pages near current -->
-                    <?php
-                    $start = max(2, $page - 1);
-                    $end   = min($total_pages - 1, $page + 1);
-                    for ($i = $start; $i <= $end; $i++):
-                    ?>
-                        <a href="?page=<?= $i ?>&limit=<?= $per_page ?>"
-                            class="px-3 py-1 border rounded <?= ($i == $page) ? 'bg-red-500 text-white' : 'bg-red-100 hover:bg-red-200' ?>">
-                            <?= str_pad($i, 2, '0', STR_PAD_LEFT) ?>
-                        </a>
-                    <?php endfor; ?>
-
-                    <!-- Middle page -->
-                    <?php
-                    if ($total_pages > 10) {
-                        $middle = floor($total_pages / 2);
-                        if ($middle > $end + 1 && abs($middle - $page) > 2) {
-                            echo '<span class="px-2">...</span>';
-                            echo '<a href="?page=' . $middle . '&limit=' . $per_page . '" class="px-3 py-1 border rounded bg-red-100 hover:bg-red-200">'
-                                . str_pad($middle, 2, '0', STR_PAD_LEFT) . '</a>';
-                        }
-                    }
-                    ?>
-
-                    <!-- Right dots -->
-                    <?php if ($page < $total_pages - 2): ?>
-                        <span class="px-2">...</span>
-                    <?php endif; ?>
-
-                    <!-- Last page -->
-                    <?php if ($total_pages > 1): ?>
-                        <a href="?page=<?= $total_pages ?>&limit=<?= $per_page ?>"
-                            class="px-3 py-1 border rounded <?= ($page == $total_pages) ? 'bg-red-500 text-white' : 'bg-red-100 hover:bg-red-200' ?>">
-                            <?= str_pad($total_pages, 2, '0', STR_PAD_LEFT) ?>
-                        </a>
-                    <?php endif; ?>
-
-                    <!-- Next -->
-                    <?php if ($page < $total_pages): ?>
-                        <a href="?page=<?= $page + 1 ?>&limit=<?= $per_page ?>" class="px-3 py-1 border rounded hover:bg-gray-100">&gt;</a>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
-
-        </div>
-    </div>
-
 
     <div class="overflow-x-auto px-5 mx-5 py-3">
         <table class="min-w-full border-collapse bg-white rounded-sm shadow-md overflow-hidden whitespace-nowrap">
@@ -228,14 +115,5 @@ include '../private/shared/admin_header.php';
                 location.reload();
             })
             .catch(err => console.error(err));
-    }
-
-
-
-    function changeLimit(limit) {
-        const urlParams = new URLSearchParams(window.location.search);
-        urlParams.set('limit', limit);
-        urlParams.set('page', 1);
-        window.location.search = urlParams.toString();
     }
 </script>

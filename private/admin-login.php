@@ -3,7 +3,7 @@ session_start();
 
 // Hardcoded admin credentials
 define('ADMIN_USERNAME', 'admin');
-define('ADMIN_PASSWORD', 'yourpasswordgoeshere');
+define('ADMIN_PASSWORD', '1234');
 
 // Redirect if already logged in
 if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
