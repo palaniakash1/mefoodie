@@ -211,6 +211,8 @@ include '../private/shared/admin_header.php';
 </html>
 
 <script>
+    const csrfToken = "<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>";
+
     function updateStatus(id, status) {
         if (!confirm(`Are you sure you want to set this as ${status}?`)) return;
 
@@ -219,7 +221,7 @@ include '../private/shared/admin_header.php';
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body: `id=${id}&status=${status}`
+                body: `id=${encodeURIComponent(id)}&status=${encodeURIComponent(status)}&csrf_token=${encodeURIComponent(csrfToken)}`
             })
             .then(res => res.text())
             .then(data => {
